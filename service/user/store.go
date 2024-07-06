@@ -4,7 +4,7 @@ import (
 	"artc-back/types"
 	"database/sql"
 	"fmt"
-	"github.com/google/uuid"
+	"github.com/nrednav/cuid2"
 )
 
 type Store struct {
@@ -17,7 +17,7 @@ func NewStore(db *sql.DB) *Store {
 
 func (store *Store) CreateUser(user types.User) error {
 	_, err := store.db.Exec("INSERT INTO users (id, first_name, last_name, email, password, speciality_id, location) VALUES (?, ?, ?, ?, ?, ?, ?)",
-		uuid.New().String(), user.FirstName, user.SecondName, user.Email, user.Password, user.SpecialityID, user.Location)
+		cuid2.Generate(), user.FirstName, user.SecondName, user.Email, user.Password, user.SpecialityID, user.Location)
 	if err != nil {
 		return err
 	}
@@ -39,7 +39,7 @@ func (store *Store) GetUserById(id string) (*types.User, error) {
 		}
 	}
 
-	if user == nil || user.PK == 0 {
+	if user == nil || user.ID == "" {
 		return nil, fmt.Errorf("error getting user by id: %s", id)
 	}
 
@@ -62,7 +62,7 @@ func (store *Store) GetUserByEmail(email string) (*types.User, error) {
 
 	fmt.Println("user", user)
 
-	if user == nil || user.PK == 0 {
+	if user == nil || user.ID == "" {
 		return nil, fmt.Errorf("error getting user by email: %s", email)
 	}
 
@@ -72,7 +72,6 @@ func (store *Store) GetUserByEmail(email string) (*types.User, error) {
 func scanRowIntoUser(rows *sql.Rows) (*types.User, error) {
 	user := new(types.User)
 	err := rows.Scan(
-		&user.PK,
 		&user.ID,
 		&user.AvatarURL,
 		&user.FirstName,

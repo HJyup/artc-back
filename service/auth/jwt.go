@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/uuid"
 	"log"
 	"net/http"
 	"time"
@@ -52,7 +51,7 @@ func WithJWTAuth(handlerFunc http.HandlerFunc, store types.UserStore) http.Handl
 	}
 }
 
-func CreateJWT(secret []byte, userID uuid.UUID) (string, error) {
+func CreateJWT(secret []byte, userID string) (string, error) {
 	expiration := time.Second * time.Duration(config.Envs.JWTExpiration)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
