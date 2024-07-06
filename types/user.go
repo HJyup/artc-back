@@ -2,7 +2,6 @@ package types
 
 import (
 	"database/sql"
-	"github.com/google/uuid"
 	"time"
 )
 
@@ -15,8 +14,7 @@ type UserStore interface {
 }
 
 type User struct {
-	PK           int            `json:"pk"`
-	ID           uuid.UUID      `json:"id"`
+	ID           string         `json:"id"`
 	AvatarURL    sql.NullString `json:"avatar"`
 	FirstName    string         `json:"first_name"`
 	SecondName   string         `json:"second_name"`
@@ -30,13 +28,12 @@ type User struct {
 }
 
 type RegisterUserPayload struct {
-	ID           uuid.UUID `json:"id"`
-	FirstName    string    `json:"first_name" validate:"required"`
-	SecondName   string    `json:"second_name" validate:"required"`
-	Email        string    `json:"email" validate:"required,email"`
-	Password     string    `json:"password" validate:"required,min=6,max=32"`
-	SpecialityID int       `json:"speciality_id"`
-	Location     string    `json:"location" validate:"required"`
+	FirstName    string `json:"first_name" validate:"required"`
+	SecondName   string `json:"second_name" validate:"required"`
+	Email        string `json:"email" validate:"required,email"`
+	Password     string `json:"password" validate:"required,min=6,max=32"`
+	SpecialityID int    `json:"speciality_id"`
+	Location     string `json:"location" validate:"required"`
 }
 
 type LoginUserPayload struct {
