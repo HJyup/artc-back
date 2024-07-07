@@ -92,7 +92,7 @@ func (handler *Handler) HandleRegister(w http.ResponseWriter, r *http.Request) {
 
 	err = handler.store.CreateUser(types.User{
 		FirstName:    payload.FirstName,
-		SecondName:   payload.SecondName,
+		LastName:     payload.LastName,
 		Email:        payload.Email,
 		Password:     hashedPassword,
 		Location:     payload.Location,
