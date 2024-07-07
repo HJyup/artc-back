@@ -15,6 +15,8 @@ import (
 type contextKey string
 
 const UserKey contextKey = "userID"
+const IsAcceptedKey contextKey = "isAccepted"
+const IsReviewerKey contextKey = "isReviewer"
 
 func WithJWTAuth(handlerFunc http.HandlerFunc, store types.UserStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -43,20 +45,36 @@ func WithJWTAuth(handlerFunc http.HandlerFunc, store types.UserStore) http.Handl
 			return
 		}
 
+		if u.IsAccepted != claims["isAccepted"].(bool) {
+			log.Printf("isAccepted mismatch: %v", err)
+			permissionDenied(w)
+			return
+		}
+
+		if u.IsReviewer != claims["isReviewer"].(bool) {
+			log.Printf("isReviewer mismatch: %v", err)
+			permissionDenied(w)
+			return
+		}
+
 		ctx := r.Context()
 		ctx = context.WithValue(ctx, UserKey, u.ID)
+		ctx = context.WithValue(ctx, IsAcceptedKey, u.IsAccepted)
+		ctx = context.WithValue(ctx, IsReviewerKey, u.IsReviewer)
 		r = r.WithContext(ctx)
 
 		handlerFunc(w, r)
 	}
 }
 
-func CreateJWT(secret []byte, userID string) (string, error) {
+func CreateJWT(secret []byte, userID string, isAccepted bool, isReviewer bool) (string, error) {
 	expiration := time.Second * time.Duration(config.Envs.JWTExpiration)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"userID":    userID,
-		"expiresAt": time.Now().Add(expiration).Unix(),
+		"userID":     userID,
+		"isAccepted": isAccepted,
+		"isReviewer": isReviewer,
+		"expiresAt":  time.Now().Add(expiration).Unix(),
 	})
 
 	tokenString, err := token.SignedString(secret)
