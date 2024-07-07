@@ -17,7 +17,7 @@ func NewStore(db *sql.DB) *Store {
 
 func (store *Store) CreateUser(user types.User) error {
 	_, err := store.db.Exec("INSERT INTO users (id, first_name, last_name, email, password, speciality_id, location) VALUES (?, ?, ?, ?, ?, ?, ?)",
-		cuid2.Generate(), user.FirstName, user.SecondName, user.Email, user.Password, user.SpecialityID, user.Location)
+		cuid2.Generate(), user.FirstName, user.LastName, user.Email, user.Password, user.SpecialityID, user.Location)
 	if err != nil {
 		return err
 	}
@@ -75,7 +75,7 @@ func scanRowIntoUser(rows *sql.Rows) (*types.User, error) {
 		&user.ID,
 		&user.AvatarURL,
 		&user.FirstName,
-		&user.SecondName,
+		&user.LastName,
 		&user.Email,
 		&user.Password,
 		&user.SpecialityID,
@@ -96,7 +96,7 @@ func convertToResponseUser(user *types.User) *types.User {
 		ID:           user.ID,
 		AvatarURL:    user.AvatarURL,
 		FirstName:    user.FirstName,
-		SecondName:   user.SecondName,
+		LastName:     user.LastName,
 		Email:        user.Email,
 		Password:     user.Password,
 		SpecialityID: user.SpecialityID,
